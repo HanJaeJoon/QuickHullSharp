@@ -27,9 +27,9 @@ public class CrossCheckTests
         AssertContains(points.Select(p => new Vector3D(p.X, p.Y, p.Z)).ToArray(), hull.Vertices.Select(p => new Vector3D(p.X, p.Y, p.Z)).ToArray(), hull.Indices, 1e-4);
         AssertEuler(QuickHull.ComputeHullAsMesh(points));
 
-        ConvexHull<Vector3D> doubleHull = QuickHull.ComputeHull(coordinates, ccw: false);
+        ConvexHull<Vector3D> doubleHull = QuickHull.ComputeHullFromCoordinates(coordinates, ccw: false);
         AssertContains(points.Select(p => new Vector3D(p.X, p.Y, p.Z)).ToArray(), doubleHull.Vertices.ToArray(), doubleHull.Indices, 1e-7);
-        AssertEuler(QuickHull.ComputeHullAsMesh(coordinates));
+        AssertEuler(QuickHull.ComputeHullAsMeshFromCoordinates(coordinates));
     }
 
     // Every input point must be on or inside every face plane within epsilon. With ccw false the right-hand normals point outward.

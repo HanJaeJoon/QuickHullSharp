@@ -7,7 +7,8 @@ namespace QuickHullSharp;
 /// </summary>
 /// <remarks>
 /// The hull is always computed in double precision. Degenerate input (fewer than four points,
-/// coincident, collinear or coplanar points) still yields a closed, possibly flat, triangle mesh.
+/// coincident, collinear or coplanar points) still yields a closed but flat triangle mesh, whose triangles
+/// can have zero area or repeat a vertex index.
 /// The methods are thread-safe.
 /// </remarks>
 public static class QuickHull
@@ -24,9 +25,13 @@ public static class QuickHull
     /// Whether the indices refer to <paramref name="points"/> (and <see cref="ConvexHull{TVertex}.Vertices"/> is a copy of it)
     /// instead of a new vertex buffer holding only the hull vertices.
     /// </param>
-    /// <param name="epsilon">Minimum distance to a plane to consider a point being on the positive side of it, for a point cloud with scale 1.</param>
+    /// <param name="epsilon">
+    /// Minimum distance to a plane to consider a point being on the positive side of it, relative to the scale of the point cloud,
+    /// which is its largest absolute coordinate: a point cloud far from the origin keeps less detail.
+    /// </param>
     /// <returns>The convex hull.</returns>
     /// <exception cref="ArgumentException">A point is not finite.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="epsilon"/> is negative or not finite.</exception>
     public static ConvexHull<Vector3> ComputeHull(ReadOnlySpan<Vector3> points, bool ccw = true, bool useOriginalIndices = false, float epsilon = 0.0001f)
     {
         var builder = new QuickHullBuilder(ToVector3D(points), epsilon);
@@ -45,10 +50,14 @@ public static class QuickHull
     /// Whether the indices refer to the input points (and <see cref="ConvexHull{TVertex}.Vertices"/> holds all of them)
     /// instead of a new vertex buffer holding only the hull vertices.
     /// </param>
-    /// <param name="epsilon">Minimum distance to a plane to consider a point being on the positive side of it, for a point cloud with scale 1.</param>
+    /// <param name="epsilon">
+    /// Minimum distance to a plane to consider a point being on the positive side of it, relative to the scale of the point cloud,
+    /// which is its largest absolute coordinate: a point cloud far from the origin keeps less detail.
+    /// </param>
     /// <returns>The convex hull.</returns>
     /// <exception cref="ArgumentException">The length of <paramref name="coordinates"/> is not a multiple of 3, or a coordinate is not finite.</exception>
-    public static ConvexHull<Vector3D> ComputeHull(ReadOnlySpan<double> coordinates, bool ccw = true, bool useOriginalIndices = false, double epsilon = 0.0000001)
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="epsilon"/> is negative or not finite.</exception>
+    public static ConvexHull<Vector3D> ComputeHullFromCoordinates(ReadOnlySpan<double> coordinates, bool ccw = true, bool useOriginalIndices = false, double epsilon = 0.0000001)
     {
         Vector3D[] points = ToVector3D(coordinates);
         var builder = new QuickHullBuilder(points, epsilon);
@@ -59,9 +68,13 @@ public static class QuickHull
     /// Computes the convex hull of a point cloud as a half edge mesh.
     /// </summary>
     /// <param name="points">The point cloud. May be empty, which yields an empty mesh.</param>
-    /// <param name="epsilon">Minimum distance to a plane to consider a point being on the positive side of it, for a point cloud with scale 1.</param>
+    /// <param name="epsilon">
+    /// Minimum distance to a plane to consider a point being on the positive side of it, relative to the scale of the point cloud,
+    /// which is its largest absolute coordinate: a point cloud far from the origin keeps less detail.
+    /// </param>
     /// <returns>The convex hull.</returns>
     /// <exception cref="ArgumentException">A point is not finite.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="epsilon"/> is negative or not finite.</exception>
     public static HalfEdgeMesh<Vector3> ComputeHullAsMesh(ReadOnlySpan<Vector3> points, float epsilon = 0.0001f)
     {
         var builder = new QuickHullBuilder(ToVector3D(points), epsilon);
@@ -72,10 +85,14 @@ public static class QuickHull
     /// Computes the convex hull of a point cloud given in double precision as a half edge mesh.
     /// </summary>
     /// <param name="coordinates">The point cloud as consecutive (x, y, z) triples. May be empty, which yields an empty mesh.</param>
-    /// <param name="epsilon">Minimum distance to a plane to consider a point being on the positive side of it, for a point cloud with scale 1.</param>
+    /// <param name="epsilon">
+    /// Minimum distance to a plane to consider a point being on the positive side of it, relative to the scale of the point cloud,
+    /// which is its largest absolute coordinate: a point cloud far from the origin keeps less detail.
+    /// </param>
     /// <returns>The convex hull.</returns>
     /// <exception cref="ArgumentException">The length of <paramref name="coordinates"/> is not a multiple of 3, or a coordinate is not finite.</exception>
-    public static HalfEdgeMesh<Vector3D> ComputeHullAsMesh(ReadOnlySpan<double> coordinates, double epsilon = 0.0000001)
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="epsilon"/> is negative or not finite.</exception>
+    public static HalfEdgeMesh<Vector3D> ComputeHullAsMeshFromCoordinates(ReadOnlySpan<double> coordinates, double epsilon = 0.0000001)
     {
         Vector3D[] points = ToVector3D(coordinates);
         var builder = new QuickHullBuilder(points, epsilon);

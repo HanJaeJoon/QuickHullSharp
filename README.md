@@ -34,10 +34,13 @@ IReadOnlyList<int> indices = hull.Indices;       // three indices per triangle
 - `useOriginalIndices` (default `false`): when `true`, the indices refer to the input points and
   `Vertices` is a copy of them; otherwise `Vertices` holds only the points on the hull.
 - `epsilon`: minimum distance to a face plane for a point to count as outside it, relative to the
-  scale of the point cloud (default `1e-4` for `Vector3` input, `1e-7` for double input).
+  scale of the point cloud (default `1e-4` for `Vector3` input, `1e-7` for double input). The scale is the
+  largest absolute coordinate, so a point cloud far from the origin keeps less detail: translate it
+  near the origin first. A negative or non-finite value throws `ArgumentOutOfRangeException`.
 
 Degenerate input (fewer than four points, or coincident, collinear or coplanar points) still
-yields a closed triangle mesh, which is then flat.
+yields a closed triangle mesh, which is then flat and can contain zero-area triangles that repeat
+a vertex index.
 
 ### Double-precision input
 
@@ -46,8 +49,12 @@ returned as `Vector3D`. The hull is always computed in double precision.
 
 ``` c#
 double[] coordinates = [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1];
-ConvexHull<Vector3D> hull = QuickHull.ComputeHull(coordinates);
+ConvexHull<Vector3D> hull = QuickHull.ComputeHullFromCoordinates(coordinates);
 ```
+
+`ComputeHullAsMeshFromCoordinates` is the half edge mesh counterpart. The default `epsilon` of the
+double path (`1e-7`) is 1000x tighter than the `Vector3` default (`1e-4`), so switching paths changes
+the hull size and speed on dense point clouds: pass the same `epsilon` to both to get comparable results.
 
 ### Half edge mesh
 

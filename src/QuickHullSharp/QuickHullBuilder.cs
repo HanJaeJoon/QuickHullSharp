@@ -58,6 +58,12 @@ internal sealed class QuickHullBuilder
     // Constructs the convex hull of pointCloud into Mesh.
     public QuickHullBuilder(Vector3D[] pointCloud, double epsilon)
     {
+        // NaN fails the face index search, and a negative or infinite epsilon yields a hull that does not contain the points.
+        if (!(epsilon >= 0) || double.IsInfinity(epsilon))
+        {
+            throw new ArgumentOutOfRangeException(nameof(epsilon), epsilon, "Epsilon must be a finite, non-negative number.");
+        }
+
         _vertexData = pointCloud;
         if (pointCloud.Length == 0)
         {
