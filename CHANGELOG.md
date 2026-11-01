@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-01
+
 ### Added
 
 - Initial C# port of [akuukka/quickhull](https://github.com/akuukka/quickhull):
@@ -21,3 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `epsilon` must be finite and non-negative: other values throw `ArgumentOutOfRangeException`
   instead of failing with `IndexOutOfRangeException` (NaN) or returning a hull that does not
   contain the points (negative or infinite).
+
+[Unreleased]: https://github.com/HanJaeJoon/QuickHullSharp/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/HanJaeJoon/QuickHullSharp/releases/tag/v0.1.0
